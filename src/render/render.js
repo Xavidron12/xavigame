@@ -1,6 +1,8 @@
 import { fruitTypes } from "../game/logic.js";
 
-// Cache de imágenes de jugadores
+// ================================
+//   CACHE DE IMÁGENES DE JUGADORES
+// ================================
 const playerImages = {};
 
 function loadPlayerImage(sprite) {
@@ -13,14 +15,14 @@ function loadPlayerImage(sprite) {
 }
 
 // ================================
-//      DIBUJAR FRUTAS DEL JUEGO
+//     DIBUJAR FRUTA INDIVIDUAL
 // ================================
 export function drawFruit(ctx, fruit) {
   const info = fruitTypes[fruit.type];
   const r = fruit.radius;
   const scale = info.renderScale;
 
-  const offsetY = r * 0.-8;
+  const offsetY = r * 0.16;
 
   if (fruit.img && fruit.img.complete) {
     const size = r * 2 * scale;
@@ -76,9 +78,8 @@ export function drawWalls(ctx, width, height) {
 // ================================
 export function drawPlayers(ctx, players) {
   players.forEach(p => {
-
     const img = loadPlayerImage(p.sprite);
-    if (!img.complete) return; // aún cargando
+    if (!img.complete) return;
 
     const size = 55;
 
@@ -102,20 +103,20 @@ export function drawNextFruits(canvasId, list) {
 
   ctx.clearRect(0, 0, c.width, c.height);
 
-  list.forEach((type, i) => {
-    const names = [
-      "cereza.png",
-      "fresa.png",
-      "uva.png",
-      "limon.png",
-      "manzana_verde.png",
-      "naranja.png",
-      "pera.png",
-      "mango.png",
-      "aguacate.png",
-      "sandia.png"
-    ];
+  const names = [
+    "cereza.png",
+    "fresa.png",
+    "uva.png",
+    "limon.png",
+    "manzana_verde.png",
+    "naranja.png",
+    "pera.png",
+    "mango.png",
+    "aguacate.png",
+    "sandia.png"
+  ];
 
+  list.forEach((type, i) => {
     const img = new Image();
     img.src = "/img/" + names[type];
 
@@ -123,11 +124,9 @@ export function drawNextFruits(canvasId, list) {
     const x = c.width / 2 - size / 2;
     const y = 10 + i * 45;
 
-    if (img.complete) {
-  ctx.drawImage(img, x, y, size, size);
-} else {
-  img.onload = () => ctx.drawImage(img, x, y, size, size);
-}
-
+    if (img.complete)
+      ctx.drawImage(img, x, y, size, size);
+    else
+      img.onload = () => ctx.drawImage(img, x, y, size, size);
   });
 }

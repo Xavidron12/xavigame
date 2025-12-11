@@ -60,36 +60,41 @@ export function collisionsAndFusion(fruits, fruitTypes) {
 }
 
 function handleCollision(f1, f2, toAdd, toRemove, fruitTypes) {
-
   const dx = f2.x - f1.x;
   const dy = f2.y - f1.y;
   const dist = Math.hypot(dx, dy);
   if (!isFinite(dist) || dist <= 0) return;
   const minDist = f1.radius + f2.radius;
 
-  if (!isFinite(dist) || dist <= 0) return;
   if (dist >= minDist) return;
 
-  //
-  // 🟡 DEEP SLEEP:
-  // Si ambas frutas están dormidas, NO hacemos nada
-  //
+  // 🟡 DEEP SLEEP: ambas dormidas → nada
   if (f1.sleeping && f2.sleeping) return;
 
-  //
-  // Si había una dormida y recibe golpe → DESPERTAR
-  //
+  // Despertar si estaban dormidas
   if (f1.sleeping) f1.sleeping = false;
   if (f2.sleeping) f2.sleeping = false;
 
-  // ==== FUSIÓN ====
-  if (f1.type === f2.type && f1.type < fruitTypes.length - 1) {
+  // =====================================================
+  //             FUSIÓN ESPECIAL
+  // =====================================================
+  if (f1.type === f2.type) {
+    const lastType = fruitTypes.length - 1;
+
+    // 🔴 Si son SANDÍAS (último tipo) → desaparecen
+    if (f1.type >= lastType) {
+      toRemove.add(f1);
+      toRemove.add(f2);
+      return;
+    }
+
+    // Fusión normal → fruta de tipo siguiente
     const next = f1.type + 1;
     const info = fruitTypes[next];
+
     const midX = (f1.x + f2.x) / 2;
     const midY = (f1.y + f2.y) / 2;
-      // Protección contra números inválidos
-  if (!isFinite(midX) || !isFinite(midY)) return;
+    if (!isFinite(midX) || !isFinite(midY)) return;
 
     const nf = new Fruit(midX, midY, next, info.radius, info.color);
     nf.vx = (f1.vx + f2.vx) * 0.5;
@@ -101,22 +106,20 @@ function handleCollision(f1, f2, toAdd, toRemove, fruitTypes) {
     return;
   }
 
-  // ==== COLISIÓN NORMAL ====
-
+  // =====================================================
+  //             COLISIÓN NORMAL
+  // =====================================================
   const nx = dx / dist;
   const ny = dy / dist;
 
-  // Corrección (reduce jitter)
   let overlap = minDist - dist;
   if (overlap > 20) overlap = 20;
   if (overlap < 0.1) overlap = 0.1;
 
-  // Si están despiertas → separación más fuerte
   const correction = (f1.sleeping || f2.sleeping)
     ? overlap
     : overlap * 1.10;
 
-  // Distribuir según masa
   const totalMass = f1.mass + f2.mass;
   const k1 = f2.mass / totalMass;
   const k2 = f1.mass / totalMass;
@@ -126,7 +129,6 @@ function handleCollision(f1, f2, toAdd, toRemove, fruitTypes) {
   f2.x += nx * correction * k2;
   f2.y += ny * correction * k2;
 
-  // Velocidad relativa
   const rvx = f2.vx - f1.vx;
   const rvy = f2.vy - f1.vy;
   const relVel = rvx * nx + rvy * ny;

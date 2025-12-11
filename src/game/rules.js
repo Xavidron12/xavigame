@@ -1,12 +1,16 @@
 export function checkGameOver(fruits, height) {
-  const CEILING_LIMIT = 120;  
-  // antes solía ser 0 u otro valor muy estrictos
+  const CEILING_LIMIT = 0;  
 
   for (const f of fruits) {
-    // si la fruta está muy dormida o parada no pasa nada
-    if (f.sleeping === false && f.y - f.radius < CEILING_LIMIT) {
+
+    // Solo frutas dormidas cuentan para GAME OVER
+    if (!f.sleeping) continue;
+
+    // Si cualquier fruta dormida toca el techo → Perdido
+    if (f.y - f.radius < CEILING_LIMIT) {
       return true;
     }
   }
+
   return false;
 }

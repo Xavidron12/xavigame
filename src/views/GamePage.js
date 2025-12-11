@@ -5,48 +5,57 @@ export function GamePage() {
   const div = document.createElement("div");
 
   div.innerHTML = `
-    <div class="game-container d-flex align-items-center justify-content-center">
+    <div class="game-page d-flex flex-column align-items-center">
 
-      <!-- Reglas -->
-      <div class="rules-card shadow-lg rounded-4 p-4 me-5">
-        <h4 class="fw-bold text-light mb-3">🎮 Reglas</h4>
-        <ul class="list-unstyled text-light small">
-          <li><strong>Jugador 1:</strong></li>
-          <li>🕹️ Mover: <kbd>A</kbd> / <kbd>D</kbd></li>
-          <li>🍎 Tirar fruta: <kbd>Espacio</kbd></li>
-          <hr class="bg-light opacity-25" />
-          <li><strong>Jugador 2:</strong></li>
-          <li>🕹️ Mover: <kbd>←</kbd> / <kbd>→</kbd></li>
-          <li>🍊 Tirar fruta: <kbd>↓</kbd></li>
-        </ul>
+      <!-- === BARRA SUPERIOR DE JUGADORES === -->
+      <div class="players-bar">
+        <img id="player1-avatar" class="player-avatar" src="/img/cereza.png" />
+        <img id="player2-avatar" class="player-avatar" src="/img/platano.png" />
       </div>
 
-      <div id="next1" class="next-box small-next me-2">
-        <canvas id="nextCanvas1" width="60" height="140"></canvas>
-      </div>
+      <div class="game-container d-flex align-items-center justify-content-center">
 
-      <div class="canvas-wrapper" style="position: relative;">
-        <fruit-game></fruit-game>
-        <game-over-banner></game-over-banner>
-      </div>
+        <!-- Reglas -->
+        <div class="rules-card shadow-lg rounded-4 p-4 me-5">
+          <h4 class="fw-bold text-light mb-3">🎮 Reglas</h4>
+          <ul class="list-unstyled text-light small">
+            <li><strong>Jugador 1:</strong></li>
+            <li>🕹️ Mover: <kbd>A</kbd> / <kbd>D</kbd></li>
+            <li>🍎 Tirar fruta: <kbd>Espacio</kbd></li>
+            <hr class="bg-light opacity-25" />
+            <li><strong>Jugador 2:</strong></li>
+            <li>🕹️ Mover: <kbd>←</kbd> / <kbd>→</kbd></li>
+            <li>🍊 Tirar fruta: <kbd>↓</kbd></li>
+          </ul>
+        </div>
 
-      <div id="next2" class="next-box small-next ms-2">
-        <canvas id="nextCanvas2" width="60" height="140"></canvas>
-      </div>
+        <div class="next-box small-next me-2">
+          <canvas id="nextCanvas1" width="60" height="140"></canvas>
+        </div>
 
-      <div class="d-flex flex-column ms-4">
-        <button id="saveBtn" type="button" class="btn btn-primary mb-2">
-          Guardar Progreso
-        </button>
-        <button id="exitBtn" type="button" class="btn btn-secondary">
-          Salir
-        </button>
-      </div>
+        <div class="canvas-wrapper" style="position: relative;">
+          <fruit-game></fruit-game>
+          <game-over-banner></game-over-banner>
+        </div>
 
+        <div class="next-box small-next ms-2">
+          <canvas id="nextCanvas2" width="60" height="140"></canvas>
+        </div>
+
+        <div class="d-flex flex-column ms-4">
+          <button id="saveBtn" type="button" class="btn btn-primary mb-2">
+            Guardar Progreso
+          </button>
+          <button id="exitBtn" type="button" class="btn btn-secondary">
+            Salir
+          </button>
+        </div>
+
+      </div>
     </div>
   `;
 
-  // Arrancar juego
+  // Iniciar juego
   setTimeout(() => startGame(), 50);
 
   const saveBtn = div.querySelector("#saveBtn");
@@ -58,10 +67,10 @@ export function GamePage() {
     window.location.href = "/login";
   };
 
-  // GUARDAR
+  // GUARDAR PARTIDA
   saveBtn.onclick = async (e) => {
     e.preventDefault();
-    saveBtn.blur(); // 🔹 quita el foco del botón
+    saveBtn.blur();
 
     const snap = window.exportGameState();
 
@@ -70,7 +79,6 @@ export function GamePage() {
     });
 
     if (error) {
-      console.error("❌ Error guardando:", error);
       alert("❌ Error al guardar");
     } else {
       alert("✔ Partida guardada");

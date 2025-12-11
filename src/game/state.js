@@ -11,7 +11,7 @@ const baseState = {
   players: [
     {
       x: 150,
-      y: 50,
+      y: 120,
       sprite: "manzana.png",
       left: false,
       right: false,
@@ -21,7 +21,7 @@ const baseState = {
     },
     {
       x: 350,
-      y: 50,
+      y: 10,
       sprite: "platano.png",
       left: false,
       right: false,
