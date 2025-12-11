@@ -139,6 +139,13 @@ export function startGame() {
     drawNextFruits("nextCanvas2", value[1]);
   });
 
+
+  if (!window.__inputListenersAttached) {
+  window.__inputListenersAttached = true;
+  document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener("keyup", handleKeyUp);
+}
+
   // INPUT seguro
   document.addEventListener("keydown", handleKeyDown);
   document.addEventListener("keyup", handleKeyUp);

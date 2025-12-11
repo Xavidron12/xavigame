@@ -123,6 +123,11 @@ export function drawNextFruits(canvasId, list) {
     const x = c.width / 2 - size / 2;
     const y = 10 + i * 45;
 
-    img.onload = () => ctx.drawImage(img, x, y, size, size);
+    if (img.complete) {
+  ctx.drawImage(img, x, y, size, size);
+} else {
+  img.onload = () => ctx.drawImage(img, x, y, size, size);
+}
+
   });
 }

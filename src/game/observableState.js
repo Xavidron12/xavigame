@@ -1,52 +1,39 @@
 // =====================================================
-// OBSERVABLE STATE — Sistema reactivo ligero
+// OBSERVABLE STATE — Sistema reactivo ligero SIN BUCLES
 // =====================================================
 
-// Cada propiedad puede tener múltiples suscriptores
 const listeners = new Map();
+let isEmitting = false;  // <-- evita efecto cascada
 
-/**
- * Suscribir a un campo concreto del estado.
- */
 export function subscribe(key, callback) {
-  if (!listeners.has(key)) {
-    listeners.set(key, new Set());
-  }
+  if (!listeners.has(key)) listeners.set(key, new Set());
   listeners.get(key).add(callback);
 }
 
-/**
- * Desuscribir (por si lo necesitas en componentes).
- */
 export function unsubscribe(key, callback) {
-  if (listeners.has(key)) {
-    listeners.get(key).delete(callback);
-  }
+  if (listeners.has(key)) listeners.get(key).delete(callback);
 }
 
-/**
- * Notifica a todos los listeners que un campo cambió.
- */
 export function notify(key, value) {
-  if (!listeners.has(key)) return;
+  if (isEmitting) return;      // ⛔ protección anti-bucles
+  isEmitting = true;
 
-  for (const cb of listeners.get(key)) {
-    cb(value);
+  const subs = listeners.get(key);
+  if (subs) {
+    for (const cb of subs) cb(value);
   }
+
+  isEmitting = false;
 }
 
-/**
- * Crea un proxy que vigila modificaciones
- * de GameState y dispara notificaciones automáticamente.
- */
+// PROXY SEGURO
 export function makeObservableState(state) {
   return new Proxy(state, {
     set(obj, prop, value) {
+      const changed = obj[prop] !== value;
       obj[prop] = value;
 
-      // Notificar a los listeners de esa propiedad
-      notify(prop, value);
-
+      if (changed) notify(prop, value);
       return true;
     }
   });
