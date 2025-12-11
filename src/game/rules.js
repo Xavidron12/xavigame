@@ -1,22 +1,12 @@
-// ===========================================
-//  RULES — Lógica pura de reglas del juego
-// ===========================================
-
-/**
- * Devuelve true si alguna fruta ha pasado
- * por encima de un límite de seguridad.
- *
- * height: altura total del canvas
- * margin: margen desde arriba donde consideramos "game over"
- */
-export function checkGameOver(fruits, height, margin = 40) {
-  const limitY = margin; // línea imaginaria cerca del techo
+export function checkGameOver(fruits, height) {
+  const CEILING_LIMIT = 120;  
+  // antes solía ser 0 u otro valor muy estrictos
 
   for (const f of fruits) {
-    if (f.y - f.radius <= limitY) {
+    // si la fruta está muy dormida o parada no pasa nada
+    if (f.sleeping === false && f.y - f.radius < CEILING_LIMIT) {
       return true;
     }
   }
-
   return false;
 }

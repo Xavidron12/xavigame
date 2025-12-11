@@ -35,34 +35,38 @@ export function GamePage() {
       </div>
 
       <div class="d-flex flex-column ms-4">
-        <button id="saveBtn" class="btn btn-primary mb-2">Guardar Progreso</button>
-        <button id="exitBtn" class="btn btn-secondary">Salir</button>
+        <button id="saveBtn" type="button" class="btn btn-primary mb-2">
+          Guardar Progreso
+        </button>
+        <button id="exitBtn" type="button" class="btn btn-secondary">
+          Salir
+        </button>
       </div>
 
     </div>
   `;
 
-  // ==========================
-  // 🔥 Arrancar juego
-  // ==========================
+  // Arrancar juego
   setTimeout(() => startGame(), 50);
 
-  // ==========================
-  // 🔹 Botón SALIR
-  // ==========================
-  div.querySelector("#exitBtn").onclick = async () => {
+  const saveBtn = div.querySelector("#saveBtn");
+  const exitBtn = div.querySelector("#exitBtn");
+
+  // SALIR
+  exitBtn.onclick = async () => {
     await supabase.auth.signOut();
     window.location.href = "/login";
   };
 
-  // ==========================
-  // 🔹 Botón GUARDAR
-  // ==========================
-  div.querySelector("#saveBtn").onclick = async () => {
+  // GUARDAR
+  saveBtn.onclick = async (e) => {
+    e.preventDefault();
+    saveBtn.blur(); // 🔹 quita el foco del botón
+
     const snap = window.exportGameState();
 
     const { error } = await supabase.auth.updateUser({
-      data: { gameState: { ...snap } }   // ⚡ Fuerza actualización real
+      data: { gameState: { ...snap } }
     });
 
     if (error) {

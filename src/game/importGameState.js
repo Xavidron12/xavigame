@@ -4,7 +4,7 @@
 
 import { GameState } from "./state.js";
 import Fruit from "./Fruit.js";
-import { nextFruits, fruits, players } from "./logic.js";
+import { fruits, players, fruitTypes } from "./logic.js";
 
 export function importGameState(saved) {
   if (!saved) return;
@@ -15,15 +15,15 @@ export function importGameState(saved) {
 
   // Restaurar frutas
   saved.fruits.forEach(f => {
-    const nf = new Fruit(f.x, f.y, f.type, f.radius);
+    const info = fruitTypes[f.type];
+    const nf = new Fruit(f.x, f.y, f.type, info.radius);
 
-    // Dejamos las posiciones, pero las "congelamos"
-    nf.vx = 0;
-    nf.vy = 0;
-    nf.rotation = f.rotation || 0;
+    nf.vx = f.vx;
+    nf.vy = f.vy;
+    nf.rotation = f.rotation;
     nf.mass = f.mass;
-    nf.sleeping = true;
-    nf.sleepCounter = 999;
+    nf.sleeping = f.sleeping;
+    nf.sleepCounter = f.sleepCounter;
 
     fruits.push(nf);
     GameState.fruits.push(nf);
@@ -35,16 +35,10 @@ export function importGameState(saved) {
   players[1].x = saved.players[1].x;
   players[1].y = saved.players[1].y;
 
-  // Restaurar próximas frutas
-  nextFruits[0].length = 0;
-  nextFruits[1].length = 0;
-
-  saved.nextFruits[0].forEach(n => nextFruits[0].push(n));
-  saved.nextFruits[1].forEach(n => nextFruits[1].push(n));
-
+  // Restaurar próximas frutas (solo GameState)
   GameState.nextFruits = [
-    [...nextFruits[0]],
-    [...nextFruits[1]],
+    [...saved.nextFruits[0]],
+    [...saved.nextFruits[1]],
   ];
 
   GameState.gameOver = false;
