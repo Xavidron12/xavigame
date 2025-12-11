@@ -30,14 +30,12 @@ export const fruitTypes = [
   { radius: 170, renderScale: 1.30 }  // 9 sandía (último nivel)
 ];
 
-export const SPAWN_MAX_INDEX = 3;
+export const SPAWN_MAX_INDEX = 3; // solo frutas pequeñas al spawnear
 
-// Fruta aleatoria (solo pequeñas)
 function randomFruitType() {
   return Math.floor(Math.random() * (SPAWN_MAX_INDEX + 1));
 }
 
-// Próximas frutas (reactivas)
 export const nextFruits = GameState.nextFruits;
 
 // Inicializar colas si están vacías
@@ -57,24 +55,31 @@ export function spawnFruit(playerIndex) {
   const typeIndex = nextFruits[playerIndex].shift();
   const info = fruitTypes[typeIndex];
 
+  // =================================================
+  // 🔧 AJUSTES MANUALES DE SPAWN
+  // =================================================
   const SAFE_SPAWN_Y = 10;
 
-  // ===================================================
-  // 🔴 🔴 🔴 AJUSTA SOLO ESTE VALOR 🔴 🔴 🔴
-  // ===================================================
-  // SI LA FRUTA CAE A LA DERECHA → MÁS NEGATIVO
-  // SI CAE A LA IZQUIERDA → MÁS POSITIVO
+  // 👉 TOCA ESTE VALOR SI LA FRUTA NO CAE JUSTO DEBAJO
+  //    (tú ya has encontrado que -25 es perfecto)
   const SPAWN_OFFSET_X = -25;
-  // ===================================================
 
-  const fruitX = player.x + SPAWN_OFFSET_X;
-  const fruit = new Fruit(fruitX, SAFE_SPAWN_Y, typeIndex, info.radius);
+  const fruit = new Fruit(
+    player.x + SPAWN_OFFSET_X,
+    SAFE_SPAWN_Y,
+    typeIndex,
+    info.radius
+  );
+
+  // ⏱️ IMPORTANTE PARA GAME OVER (grace time)
+  fruit.spawnTime = performance.now();
+
   fruits.push(fruit);
 
   // Nueva fruta en la cola
   nextFruits[playerIndex].push(randomFruitType());
 
-  // Forzar actualización de previews
+  // Forzar reactividad para previews
   GameState.nextFruits = [
     [...nextFruits[0]],
     [...nextFruits[1]]
@@ -82,7 +87,7 @@ export function spawnFruit(playerIndex) {
 }
 
 // =====================================================
-//  FÍSICAS + COLISIONES
+//  FÍSICAS
 // =====================================================
 export function step(dt, width, height) {
   const h = dt / CONFIG.subSteps;

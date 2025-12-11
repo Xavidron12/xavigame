@@ -1,15 +1,17 @@
 export function checkGameOver(fruits, height) {
-  const CEILING_LIMIT = 0;  
+  const CEILING_LIMIT = 0;     // techo real del canvas (y=0)
+  const GRACE_MS = 400;        // margen para que no salte al spawnear
+
+  const now = performance.now();
 
   for (const f of fruits) {
+    const t0 = f.spawnTime ?? 0;
 
-    // Solo frutas dormidas cuentan para GAME OVER
-    if (!f.sleeping) continue;
+    // Ignorar frutas recién creadas
+    if (now - t0 < GRACE_MS) continue;
 
-    // Si cualquier fruta dormida toca el techo → Perdido
-    if (f.y - f.radius < CEILING_LIMIT) {
-      return true;
-    }
+    // ✅ GameOver si cualquier fruta toca/pasa el techo (da igual sleeping)
+    if (f.y - f.radius <= CEILING_LIMIT) return true;
   }
 
   return false;
