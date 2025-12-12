@@ -8,7 +8,7 @@ const playerImages = {};
 function loadPlayerImage(sprite) {
   if (!playerImages[sprite]) {
     const img = new Image();
-    img.src = "/img/" + sprite;
+    img.src = `/img/${sprite}`;
     playerImages[sprite] = img;
   }
   return playerImages[sprite];
@@ -45,7 +45,7 @@ export function drawFruit(ctx, fruit) {
     ctx.arc(fruit.x, fruit.y, r, 0, Math.PI * 2);
     ctx.fillStyle = fruit.color;
     ctx.fill();
-    ctx.strokeStyle = "#0008";
+    ctx.strokeStyle = `#0008`;
     ctx.stroke();
     ctx.closePath();
   }
@@ -56,7 +56,7 @@ export function drawFruit(ctx, fruit) {
 // ================================
 export function drawWalls(ctx, width, height) {
   ctx.save();
-  ctx.strokeStyle = "#000";
+  ctx.strokeStyle = `#000`;
   ctx.lineWidth = 4;
 
   ctx.beginPath();
@@ -97,10 +97,10 @@ export function drawPlayers(ctx, players) {
 //         DIBUJAR PREVIEWS
 // ================================
 export function drawNextFruits(canvasId, list) {
-  const c = document.getElementById(canvasId);
+  const c = document.querySelector(`#${canvasId}`);
   if (!c) return;
-  const ctx = c.getContext("2d");
 
+  const ctx = c.getContext("2d");
   ctx.clearRect(0, 0, c.width, c.height);
 
   const names = [
@@ -118,15 +118,16 @@ export function drawNextFruits(canvasId, list) {
 
   list.forEach((type, i) => {
     const img = new Image();
-    img.src = "/img/" + names[type];
+    img.src = `/img/${names[type]}`;
 
     const size = 40;
     const x = c.width / 2 - size / 2;
     const y = 10 + i * 45;
 
-    if (img.complete)
+    if (img.complete) {
       ctx.drawImage(img, x, y, size, size);
-    else
+    } else {
       img.onload = () => ctx.drawImage(img, x, y, size, size);
+    }
   });
 }
