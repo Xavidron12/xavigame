@@ -3,7 +3,8 @@ import { navigate } from "../router/router.js";
 
 export function RegisterPage() {
   const div = document.createElement("div");
-  div.className = "d-flex flex-column justify-content-center align-items-center vh-100 text-light";
+  div.className =
+    "d-flex flex-column justify-content-center align-items-center vh-100 text-light";
 
   div.innerHTML = `
     <div class="card bg-dark p-4 rounded-4 shadow" style="width: 350px;">
@@ -19,22 +20,32 @@ export function RegisterPage() {
         <input id="password" type="password" class="form-control" />
       </div>
 
+      <div class="mb-3">
+        <label class="form-label">Nombre de perfil</label>
+        <input id="name" type="text" class="form-control" />
+      </div>
+
       <p id="msg" class="text-warning small"></p>
 
-      <button id="registerBtn" class="btn btn-success w-100 mb-2">Registrar</button>
-      <button id="backLogin" class="btn btn-outline-light w-100">Volver a iniciar sesión</button>
+      <button id="registerBtn" class="btn btn-success w-100 mb-2">
+        Registrar
+      </button>
+      <button id="backLogin" class="btn btn-outline-light w-100">
+        Volver a iniciar sesión
+      </button>
     </div>
   `;
 
   const email = div.querySelector("#email");
   const password = div.querySelector("#password");
+  const name = div.querySelector("#name");
   const msg = div.querySelector("#msg");
   const registerBtn = div.querySelector("#registerBtn");
 
   registerBtn.onclick = async () => {
     msg.textContent = "";
 
-    if (!email.value || !password.value) {
+    if (!email.value || !password.value || !name.value) {
       msg.textContent = "Rellena todos los campos";
       return;
     }
@@ -42,9 +53,17 @@ export function RegisterPage() {
     registerBtn.disabled = true;
     msg.textContent = "Creando cuenta...";
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: email.value.trim(),
-      password: password.value
+      password: password.value,
+      options: {
+        data: {
+          profile: {
+            name: name.value.trim(),
+            avatar: "/img/default-avatar.png"
+          }
+        }
+      }
     });
 
     registerBtn.disabled = false;
@@ -55,7 +74,6 @@ export function RegisterPage() {
     }
 
     msg.textContent = "Registro correcto. Revisa tu email.";
-
     setTimeout(() => navigate("/login"), 2000);
   };
 

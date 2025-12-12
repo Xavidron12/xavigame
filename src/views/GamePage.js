@@ -8,46 +8,54 @@ export function GamePage() {
   div.innerHTML = `
     <div class="game-page d-flex flex-column align-items-center">
 
-      <!-- === BARRA SUPERIOR DE JUGADORES === -->
-      <div class="players-bar">
-        <img id="player1-avatar" class="player-avatar" src="/img/cereza.png" />
-        <img id="player2-avatar" class="player-avatar" src="/img/platano.png" />
-      </div>
+      <div class="game-container d-flex align-items-start justify-content-center">
 
-      <div class="game-container d-flex align-items-center justify-content-center">
+        <!-- COLUMNA IZQUIERDA -->
+        <div class="d-flex flex-column me-5">
 
-        <!-- Reglas -->
-        <div class="rules-card shadow-lg rounded-4 p-4 me-5">
-          <h4 class="fw-bold text-light mb-3">🎮 Reglas</h4>
-          <ul class="list-unstyled text-light small">
-            <li><strong>Jugador 1:</strong></li>
-            <li>🕹️ Mover: <kbd>A</kbd> / <kbd>D</kbd></li>
-            <li>🍎 Tirar fruta: <kbd>Espacio</kbd></li>
-            <hr class="bg-light opacity-25" />
-            <li><strong>Jugador 2:</strong></li>
-            <li>🕹️ Mover: <kbd>←</kbd> / <kbd>→</kbd></li>
-            <li>🍊 Tirar fruta: <kbd>↓</kbd></li>
-          </ul>
+          <!-- PERFIL EN JUEGO -->
+          <div class="profile-hud card p-3 mb-3 text-center">
+            <img id="hud-avatar" class="hud-avatar mb-2" />
+            <div id="hud-name" class="hud-name">Jugador</div>
+          </div>
+
+          <!-- REGLAS -->
+          <div class="rules-card shadow-lg rounded-4 p-4">
+            <h4 class="fw-bold mb-3">🎮 Reglas</h4>
+            <ul class="list-unstyled small">
+              <li><strong>Jugador 1:</strong></li>
+              <li>🕹️ Mover: <kbd>A</kbd> / <kbd>D</kbd></li>
+              <li>🍎 Tirar fruta: <kbd>Espacio</kbd></li>
+              <hr class="opacity-25" />
+              <li><strong>Jugador 2:</strong></li>
+              <li>🕹️ Mover: <kbd>←</kbd> / <kbd>→</kbd></li>
+              <li>🍊 Tirar fruta: <kbd>↓</kbd></li>
+            </ul>
+          </div>
         </div>
 
+        <!-- PREVIEW IZQUIERDA -->
         <div class="next-box small-next me-2">
           <canvas id="nextCanvas1" width="60" height="140"></canvas>
         </div>
 
+        <!-- JUEGO -->
         <div class="canvas-wrapper" style="position: relative;">
           <fruit-game></fruit-game>
           <game-over-banner></game-over-banner>
         </div>
 
+        <!-- PREVIEW DERECHA -->
         <div class="next-box small-next ms-2">
           <canvas id="nextCanvas2" width="60" height="140"></canvas>
         </div>
 
+        <!-- BOTONES -->
         <div class="d-flex flex-column ms-4">
-          <button id="saveBtn" type="button" class="btn btn-primary mb-2">
+          <button id="saveBtn" class="btn btn-primary mb-2">
             Guardar Progreso
           </button>
-          <button id="exitBtn" type="button" class="btn btn-secondary">
+          <button id="exitBtn" class="btn btn-secondary">
             Salir
           </button>
         </div>
@@ -57,52 +65,52 @@ export function GamePage() {
   `;
 
   // ==========================
+  // CARGAR PERFIL
+  // ==========================
+  supabase.auth.getUser().then(({ data }) => {
+    const user = data.user;
+    if (!user) return;
+
+    const avatar = div.querySelector("#hud-avatar");
+    const name = div.querySelector("#hud-name");
+
+    avatar.src = user.user_metadata?.avatar_url
+      ? user.user_metadata.avatar_url + "?t=" + Date.now()
+      : "/img/cereza.png";
+
+    name.textContent = user.user_metadata?.profile_name || "Jugador";
+  });
+
+  // ==========================
   // INICIAR JUEGO
   // ==========================
   setTimeout(() => {
     startGame();
 
-    // 🔑 AJUSTAR UI SEGÚN Nº DE JUGADORES
     if (GameState.playerCount === 1) {
-      // Ocultar jugador 2
-      const p2 = div.querySelector("#player2-avatar");
-      if (p2) p2.style.display = "none";
-
-      // Ocultar preview jugador 2
       const next2 = div.querySelector("#nextCanvas2");
       if (next2) next2.parentElement.style.display = "none";
     }
   }, 50);
 
-  const saveBtn = div.querySelector("#saveBtn");
-  const exitBtn = div.querySelector("#exitBtn");
-
   // ==========================
-  // SALIR
+  // BOTONES
   // ==========================
-  exitBtn.onclick = async () => {
+  div.querySelector("#exitBtn").onclick = async () => {
     await supabase.auth.signOut();
     window.location.href = "/login";
   };
 
-  // ==========================
-  // GUARDAR PARTIDA
-  // ==========================
-  saveBtn.onclick = async (e) => {
+  div.querySelector("#saveBtn").onclick = async (e) => {
     e.preventDefault();
-    saveBtn.blur();
 
     const snap = window.exportGameState();
 
-    const { error } = await supabase.auth.updateUser({
+    await supabase.auth.updateUser({
       data: { gameState: { ...snap } }
     });
 
-    if (error) {
-      alert("❌ Error al guardar");
-    } else {
-      alert("✔ Partida guardada");
-    }
+    alert("✔ Partida guardada");
   };
 
   return div;
