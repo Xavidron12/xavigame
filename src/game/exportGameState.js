@@ -1,5 +1,5 @@
 // =====================================================
-//   EXPORTAR ESTADO DEL JUEGO  → Guardar en Supabase
+//   EXPORTAR ESTADO DEL JUEGO → Guardar en Supabase
 // =====================================================
 
 import { GameState } from "./state.js";
@@ -30,6 +30,9 @@ export function exportGameState() {
   ];
 
   return {
+    // 🔑 CLAVE: guardar modo de juego
+    playerCount: GameState.playerCount,
+
     fruits,
     players,
     nextFruits

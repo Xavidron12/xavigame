@@ -9,9 +9,12 @@ import { fruits, players, fruitTypes } from "./logic.js";
 export function importGameState(saved) {
   if (!saved) return;
 
+  // 🔑 RESTAURAR NÚMERO DE JUGADORES
+  GameState.playerCount = saved.playerCount ?? 2;
+
   // Limpiar frutas
-  GameState.fruits.length = 0;
   fruits.length = 0;
+  GameState.fruits.length = 0;
 
   // Restaurar frutas
   saved.fruits.forEach(f => {
@@ -29,19 +32,25 @@ export function importGameState(saved) {
     GameState.fruits.push(nf);
   });
 
-  // Restaurar jugadores
+  // Restaurar jugador 1
   players[0].x = saved.players[0].x;
   players[0].y = saved.players[0].y;
-  players[1].x = saved.players[1].x;
-  players[1].y = saved.players[1].y;
 
-  // Restaurar próximas frutas (solo GameState)
+  // Restaurar jugador 2 SOLO si existe
+  if (GameState.playerCount === 2 && saved.players[1]) {
+    players[1].x = saved.players[1].x;
+    players[1].y = saved.players[1].y;
+  }
+
+  // Próximas frutas
   GameState.nextFruits = [
     [...saved.nextFruits[0]],
-    [...saved.nextFruits[1]],
+    GameState.playerCount === 2
+      ? [...saved.nextFruits[1]]
+      : []
   ];
 
   GameState.gameOver = false;
 
-  console.log("✅ Partida cargada correctamente.");
+  console.log("✅ Partida cargada correctamente:", GameState.playerCount, "jugador(es)");
 }

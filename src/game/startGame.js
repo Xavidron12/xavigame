@@ -16,12 +16,8 @@ let cancelLoop = false;
 // Anti doble drop
 const lastDropTime = [0, 0];
 
-// 1 segundo:
+// Cooldown de lanzamiento (1 segundo)
 const MIN_DROP_INTERVAL = 1000;
-
-// O si quieres 2 segundos:
-/// const MIN_DROP_INTERVAL = 2000;
-
 
 // ===============================================
 // RESET DE INPUTS
@@ -39,7 +35,7 @@ function resetInputs() {
 }
 
 // ===============================================
-// HANDLERS DE TECLADO — BLOQUEADOS EN GAME OVER
+// HANDLERS DE TECLADO
 // ===============================================
 function handleKeyDown(e) {
   if (GameState.gameOver) return;
@@ -52,7 +48,6 @@ function handleKeyDown(e) {
 
   if (e.key === players[0].keyDrop) {
     const elapsed = now - lastDropTime[0];
-
     if (!InputState.p1.dropLock && elapsed > MIN_DROP_INTERVAL) {
       InputState.p1.drop = true;
       InputState.p1.dropLock = true;
@@ -61,18 +56,19 @@ function handleKeyDown(e) {
     }
   }
 
-  // ---------------- PLAYER 2 ----------------
-  if (players[1].keyLeft.includes(e.key)) InputState.p2.left = true;
-  if (players[1].keyRight.includes(e.key)) InputState.p2.right = true;
+  // ---------------- PLAYER 2 (SOLO SI EXISTE) ----------------
+  if (GameState.playerCount === 2) {
+    if (players[1].keyLeft.includes(e.key)) InputState.p2.left = true;
+    if (players[1].keyRight.includes(e.key)) InputState.p2.right = true;
 
-  if (e.key === players[1].keyDrop) {
-    const elapsed = now - lastDropTime[1];
-
-    if (!InputState.p2.dropLock && elapsed > MIN_DROP_INTERVAL) {
-      InputState.p2.drop = true;
-      InputState.p2.dropLock = true;
-      lastDropTime[1] = now;
-      spawnFruit(1);
+    if (e.key === players[1].keyDrop) {
+      const elapsed = now - lastDropTime[1];
+      if (!InputState.p2.dropLock && elapsed > MIN_DROP_INTERVAL) {
+        InputState.p2.drop = true;
+        InputState.p2.dropLock = true;
+        lastDropTime[1] = now;
+        spawnFruit(1);
+      }
     }
   }
 }
@@ -89,13 +85,15 @@ function handleKeyUp(e) {
     InputState.p1.dropLock = false;
   }
 
-  // PLAYER 2
-  if (players[1].keyLeft.includes(e.key)) InputState.p2.left = false;
-  if (players[1].keyRight.includes(e.key)) InputState.p2.right = false;
+  // PLAYER 2 (SOLO SI EXISTE)
+  if (GameState.playerCount === 2) {
+    if (players[1].keyLeft.includes(e.key)) InputState.p2.left = false;
+    if (players[1].keyRight.includes(e.key)) InputState.p2.right = false;
 
-  if (e.key === players[1].keyDrop) {
-    InputState.p2.drop = false;
-    InputState.p2.dropLock = false;
+    if (e.key === players[1].keyDrop) {
+      InputState.p2.drop = false;
+      InputState.p2.dropLock = false;
+    }
   }
 }
 
@@ -112,20 +110,29 @@ function startLoop(ctx, canvas) {
     const dt = Math.min(32, t - last) / 16.6667;
     last = t;
 
-    // Actualiza motor
+    // Actualizar motor
     GameEngine.update(dt);
 
-    // Renderiza juego en canvas
+    // Renderizar canvas
     renderGame(ctx, canvas.width, canvas.height, GameState);
 
-    // =====================================================
-    //  🔥 SINCRONIZAR JUGADORES HTML (FUERA DEL CANVAS)
-    // =====================================================
+    // ==============================
+    // SINCRONIZAR AVATARES HTML
+    // ==============================
     const p1Avatar = document.getElementById("player1-avatar");
-    const p2Avatar = document.getElementById("player2-avatar");
+    if (p1Avatar) {
+      p1Avatar.style.left = GameState.players[0].x + "px";
+    }
 
-    if (p1Avatar) p1Avatar.style.left = GameState.players[0].x + "px";
-    if (p2Avatar) p2Avatar.style.left = GameState.players[1].x + "px";
+    const p2Avatar = document.getElementById("player2-avatar");
+    if (p2Avatar) {
+      if (GameState.playerCount === 2) {
+        p2Avatar.style.display = "block";
+        p2Avatar.style.left = GameState.players[1].x + "px";
+      } else {
+        p2Avatar.style.display = "none";
+      }
+    }
 
     requestAnimationFrame(loop);
   }
@@ -150,23 +157,32 @@ export function startGame() {
   GameState.width = canvas.width;
   GameState.height = canvas.height;
 
-  // Previews iniciales
+  // ==============================
+  // PREVIEWS INICIALES
+  // ==============================
   drawNextFruits("nextCanvas1", nextFruits[0]);
-  drawNextFruits("nextCanvas2", nextFruits[1]);
 
-  // Reactividad (solo una vez)
-  subscribe("nextFruits", (value) => {
+  if (GameState.playerCount === 2) {
+    drawNextFruits("nextCanvas2", nextFruits[1]);
+  } else {
+    const c2 = document.getElementById("nextCanvas2");
+    if (c2) c2.getContext("2d").clearRect(0, 0, c2.width, c2.height);
+  }
+
+  // Reactividad previews
+  subscribe("nextFruits", value => {
     drawNextFruits("nextCanvas1", value[0]);
-    drawNextFruits("nextCanvas2", value[1]);
+    if (GameState.playerCount === 2) {
+      drawNextFruits("nextCanvas2", value[1]);
+    }
   });
 
-  // Listeners de input (una sola vez)
+  // Listeners solo una vez
   if (!window.__inputListenersAttached) {
     window.__inputListenersAttached = true;
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keyup", handleKeyUp);
   }
 
-  // Iniciar loop
   startLoop(ctx, canvas);
 }

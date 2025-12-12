@@ -1,5 +1,6 @@
 import { supabase } from "../supabase/supabaseClient.js";
 import { startGame } from "../game/startGame.js";
+import { GameState } from "../game/state.js";
 
 export function GamePage() {
   const div = document.createElement("div");
@@ -55,19 +56,38 @@ export function GamePage() {
     </div>
   `;
 
-  // Iniciar juego
-  setTimeout(() => startGame(), 50);
+  // ==========================
+  // INICIAR JUEGO
+  // ==========================
+  setTimeout(() => {
+    startGame();
+
+    // 🔑 AJUSTAR UI SEGÚN Nº DE JUGADORES
+    if (GameState.playerCount === 1) {
+      // Ocultar jugador 2
+      const p2 = div.querySelector("#player2-avatar");
+      if (p2) p2.style.display = "none";
+
+      // Ocultar preview jugador 2
+      const next2 = div.querySelector("#nextCanvas2");
+      if (next2) next2.parentElement.style.display = "none";
+    }
+  }, 50);
 
   const saveBtn = div.querySelector("#saveBtn");
   const exitBtn = div.querySelector("#exitBtn");
 
+  // ==========================
   // SALIR
+  // ==========================
   exitBtn.onclick = async () => {
     await supabase.auth.signOut();
     window.location.href = "/login";
   };
 
+  // ==========================
   // GUARDAR PARTIDA
+  // ==========================
   saveBtn.onclick = async (e) => {
     e.preventDefault();
     saveBtn.blur();

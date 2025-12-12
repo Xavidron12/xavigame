@@ -1,30 +1,26 @@
-// =====================================================
-// GAME STATE + OBSERVABLE WRAPPER
-// =====================================================
-
 import { makeObservableState } from "./observableState.js";
 import Fruit from "./Fruit.js";
 import { fruitTypes } from "./logic.js";
 
 const baseState = {
   fruits: [],
+
+  // 🔑 CLAVE DEL SISTEMA
+  playerCount: 2, // 1 o 2
+
   players: [
     {
       x: 150,
       y: 120,
       sprite: "manzana.png",
-      left: false,
-      right: false,
       keyLeft: ["a", "A"],
       keyRight: ["d", "D"],
       keyDrop: " "
     },
     {
       x: 350,
-      y: 10,
+      y: 120,
       sprite: "platano.png",
-      left: false,
-      right: false,
       keyLeft: ["ArrowLeft"],
       keyRight: ["ArrowRight"],
       keyDrop: "ArrowDown"
@@ -32,11 +28,8 @@ const baseState = {
   ],
 
   nextFruits: [[], []],
-
   width: 600,
   height: 600,
-
-  // NUEVO: flag de fin de partida (solo lectura para la UI)
   gameOver: false
 };
 
@@ -51,6 +44,7 @@ export function getGameStateSnapshot() {
   return {
     width: GameState.width,
     height: GameState.height,
+    playerCount: GameState.playerCount,
 
     fruits: GameState.fruits.map(f => ({
       x: f.x,
@@ -77,42 +71,33 @@ export function getGameStateSnapshot() {
   };
 }
 
-
-// =====================================================
-//  RESTAURAR PARTIDA GUARDADA
-// =====================================================
-
+// ============================
+// RESTAURAR PARTIDA
+// ============================
 export function restoreSavedState(saved) {
   if (!saved) return;
 
-  // Restaurar frutas reales con sus imágenes
+  GameState.playerCount = saved.playerCount ?? 2;
+
   GameState.fruits = saved.fruits.map(f => {
     const info = fruitTypes[f.type];
-    const fruit = new Fruit(f.x, f.y, f.type, info.radius, info.color);
-
+    const fruit = new Fruit(f.x, f.y, f.type, info.radius);
     fruit.vx = f.vx;
     fruit.vy = f.vy;
     fruit.sleeping = f.sleeping;
-    fruit.sleepCounter = f.sleepCounter;
     fruit.rotation = f.rotation;
-
     return fruit;
   });
 
-  // Restaurar jugadores
   GameState.players[0].x = saved.players[0].x;
-  GameState.players[1].x = saved.players[1].x;
+  if (GameState.playerCount === 2 && saved.players[1]) {
+    GameState.players[1].x = saved.players[1].x;
+  }
 
-  // Restaurar próxima fruta
   GameState.nextFruits = [
     [...saved.nextFruits[0]],
-    [...saved.nextFruits[1]]
+    [...(saved.nextFruits[1] || [])]
   ];
 
-  // Medidas del canvas
-  GameState.width = saved.width;
-  GameState.height = saved.height;
-
-  // Reset Game Over siempre al cargar partida
   GameState.gameOver = false;
 }
