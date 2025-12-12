@@ -10,8 +10,14 @@ import { GameState } from "./state.js";
 import { GameEngine } from "./engine.js";
 import { subscribe } from "./observableState.js";
 
+import { fromEvent } from "rxjs";
+
 let started = false;
 let cancelLoop = false;
+
+let keySubsAttached = false;
+let keyDownSub = null;
+let keyUpSub = null;
 
 // Anti doble drop
 const lastDropTime = [0, 0];
@@ -110,25 +116,19 @@ function startLoop(ctx, canvas) {
     const dt = Math.min(32, t - last) / 16.6667;
     last = t;
 
-    // Actualizar motor
     GameEngine.update(dt);
 
-    // Renderizar canvas
     renderGame(ctx, canvas.width, canvas.height, GameState);
 
-    // ==============================
     // SINCRONIZAR AVATARES HTML
-    // ==============================
-    const p1Avatar = document.getElementById("player1-avatar");
-    if (p1Avatar) {
-      p1Avatar.style.left = GameState.players[0].x + "px";
-    }
+    const p1Avatar = document.querySelector("#player1-avatar");
+    if (p1Avatar) p1Avatar.style.left = `${GameState.players[0].x}px`;
 
-    const p2Avatar = document.getElementById("player2-avatar");
+    const p2Avatar = document.querySelector("#player2-avatar");
     if (p2Avatar) {
       if (GameState.playerCount === 2) {
         p2Avatar.style.display = "block";
-        p2Avatar.style.left = GameState.players[1].x + "px";
+        p2Avatar.style.left = `${GameState.players[1].x}px`;
       } else {
         p2Avatar.style.display = "none";
       }
@@ -157,31 +157,27 @@ export function startGame() {
   GameState.width = canvas.width;
   GameState.height = canvas.height;
 
-  // ==============================
   // PREVIEWS INICIALES
-  // ==============================
   drawNextFruits("nextCanvas1", nextFruits[0]);
 
   if (GameState.playerCount === 2) {
     drawNextFruits("nextCanvas2", nextFruits[1]);
   } else {
-    const c2 = document.getElementById("nextCanvas2");
+    const c2 = document.querySelector("#nextCanvas2");
     if (c2) c2.getContext("2d").clearRect(0, 0, c2.width, c2.height);
   }
 
-  // Reactividad previews
-  subscribe("nextFruits", value => {
+  // Reactividad previews (GameState.nextFruits → notify("nextFruits"))
+  subscribe("nextFruits", (value) => {
     drawNextFruits("nextCanvas1", value[0]);
-    if (GameState.playerCount === 2) {
-      drawNextFruits("nextCanvas2", value[1]);
-    }
+    if (GameState.playerCount === 2) drawNextFruits("nextCanvas2", value[1]);
   });
 
-  // Listeners solo una vez
-  if (!window.__inputListenersAttached) {
-    window.__inputListenersAttached = true;
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("keyup", handleKeyUp);
+  // RxJS: listeners de teclado
+  if (!keySubsAttached) {
+    keySubsAttached = true;
+    keyDownSub = fromEvent(document, "keydown").subscribe(handleKeyDown);
+    keyUpSub = fromEvent(document, "keyup").subscribe(handleKeyUp);
   }
 
   startLoop(ctx, canvas);
