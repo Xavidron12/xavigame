@@ -45,25 +45,30 @@ body {
   border-radius: 10px;
   padding: 12px;
   width: 220px;
-  text-align: center;
   backdrop-filter: blur(8px);
-  margin-bottom: 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
-.profile-hud img {
+/* Nombre arriba */
+.profile-hud .hud-name {
+  font-weight: 600;
+  color: #ffce54;
+  margin-bottom: 8px;
+  text-shadow: 0 0 6px #ffce5488;
+}
+
+/* Foto centrada debajo */
+.profile-hud .hud-avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ffce54;
   background: #222;
-}
-
-.profile-hud .profile-name {
-  margin-top: 6px;
-  font-weight: 600;
-  color: #ffce54;
-  text-shadow: 0 0 6px #ffce5488;
 }
 
 /* === TARJETA REGLAS === */

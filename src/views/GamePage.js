@@ -8,15 +8,21 @@ export function GamePage() {
   div.innerHTML = `
     <div class="game-page d-flex flex-column align-items-center">
 
+      <!-- AVATARES JUGADORES (SE MUEVEN) -->
+      <div class="players-bar">
+        <img id="player1-avatar" class="player-avatar" src="/img/cereza.png" />
+        <img id="player2-avatar" class="player-avatar" src="/img/platano.png" />
+      </div>
+
       <div class="game-container d-flex align-items-start justify-content-center">
 
         <!-- COLUMNA IZQUIERDA -->
         <div class="d-flex flex-column me-5">
 
-          <!-- PERFIL EN JUEGO -->
+          <!-- PERFIL HUD -->
           <div class="profile-hud card p-3 mb-3 text-center">
-            <img id="hud-avatar" class="hud-avatar mb-2" />
-            <div id="hud-name" class="hud-name">Jugador</div>
+            <div id="hud-name" class="hud-name mb-2">Jugador</div>
+            <img id="hud-avatar" class="hud-avatar" />
           </div>
 
           <!-- REGLAS -->
@@ -34,38 +40,32 @@ export function GamePage() {
           </div>
         </div>
 
-        <!-- PREVIEW IZQUIERDA -->
+        <!-- PREVIEW -->
         <div class="next-box small-next me-2">
           <canvas id="nextCanvas1" width="60" height="140"></canvas>
         </div>
 
         <!-- JUEGO -->
-        <div class="canvas-wrapper" style="position: relative;">
+        <div class="canvas-wrapper">
           <fruit-game></fruit-game>
           <game-over-banner></game-over-banner>
         </div>
 
-        <!-- PREVIEW DERECHA -->
         <div class="next-box small-next ms-2">
           <canvas id="nextCanvas2" width="60" height="140"></canvas>
         </div>
 
         <!-- BOTONES -->
         <div class="d-flex flex-column ms-4">
-          <button id="saveBtn" class="btn btn-primary mb-2">
-            Guardar Progreso
-          </button>
-          <button id="exitBtn" class="btn btn-secondary">
-            Salir
-          </button>
+          <button id="saveBtn" class="btn btn-primary mb-2">Guardar Progreso</button>
+          <button id="exitBtn" class="btn btn-secondary">Salir</button>
         </div>
-
       </div>
     </div>
   `;
 
   // ==========================
-  // CARGAR PERFIL
+  // PERFIL
   // ==========================
   supabase.auth.getUser().then(({ data }) => {
     const user = data.user;
@@ -88,28 +88,19 @@ export function GamePage() {
     startGame();
 
     if (GameState.playerCount === 1) {
-      const next2 = div.querySelector("#nextCanvas2");
-      if (next2) next2.parentElement.style.display = "none";
+      document.getElementById("player2-avatar").style.display = "none";
+      document.getElementById("nextCanvas2").parentElement.style.display = "none";
     }
   }, 50);
 
-  // ==========================
-  // BOTONES
-  // ==========================
   div.querySelector("#exitBtn").onclick = async () => {
     await supabase.auth.signOut();
     window.location.href = "/login";
   };
 
-  div.querySelector("#saveBtn").onclick = async (e) => {
-    e.preventDefault();
-
+  div.querySelector("#saveBtn").onclick = async () => {
     const snap = window.exportGameState();
-
-    await supabase.auth.updateUser({
-      data: { gameState: { ...snap } }
-    });
-
+    await supabase.auth.updateUser({ data: { gameState: snap } });
     alert("✔ Partida guardada");
   };
 
