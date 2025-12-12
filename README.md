@@ -1,84 +1,59 @@
-# XaviGame 
+# XaviGame 🎮🍎
 
-Proyecto SPA desarrollado en JavaScript moderno para la asignatura **Desarrollo Web Cliente (2º DAW)**.
+Proyecto desarrollado como SPA (Single Page Application) para la asignatura de **Desarrollo Web Cliente**.
 
-El proyecto consiste en un juego inspirado en *Suika Game*, con autenticación, guardado de partida, perfil de usuario y arquitectura modular.
-
----
-
-##  Arquitectura
-
-- **SPA (Single Page Application)** con router propio
-- **Arquitectura modular (MVC aproximado)**
-- Separación clara entre:
-  - lógica del juego
-  - render
-  - estado
-  - vistas
-  - router
-  - servicios (API REST)
+El proyecto consiste en un videojuego tipo *Suika Game*, con autenticación, guardado de partida, sistema reactivo y arquitectura modular.
 
 ---
 
-##  Tecnologías utilizadas
+## 🧱 Tecnologías utilizadas
 
-- **JavaScript ES6+**
-- **Vite** (empaquetado y desarrollo)
-- **RxJS** (programación reactiva)
-- **Vitest** (tests unitarios)
-- **Supabase REST API** (sin SDK)
-- **LocalStorage** (persistencia de sesión)
+- **JavaScript ES Modules**
+- **Vite** (dev server + build)
+- **Supabase**
+  - Autenticación
+  - Storage de imágenes (avatars)
+  - Guardado de estado de partida
+- **RxJS**
+- **Web Components**
 - **HTML5 Canvas**
-- **CSS + Bootstrap**
+- **Bootstrap 5**
+- **ESLint**
+- **Vitest**
 
 ---
 
-##  Autenticación y API REST
+## 🧠 Arquitectura
 
-- Login y registro de usuarios mediante **Supabase REST**
-- Gestión de sesión usando **LocalStorage**
-- Perfil de usuario con:
-  - nombre
-  - avatar (almacenado en Supabase Storage)
-- Guardado y recuperación del estado del juego en el perfil del usuario
+El proyecto sigue una aproximación a **MVC + SPA**:
 
->  No se utiliza el SDK de Supabase, solo llamadas REST con `fetch`.
-
----
-
-##  Programación Reactiva
-
-- Uso de **RxJS**:
-  - `BehaviorSubject` para estado observable
-  - `fromEvent` para gestionar eventos de teclado
-- El estado del juego notifica automáticamente a la UI (previews, game over, etc.)
+- **Model**
+  - `GameState`
+  - Estado observable con Proxy + RxJS
+- **View**
+  - Vistas dinámicas (`LoginPage`, `RegisterPage`, `GamePage`, etc.)
+  - Web Components (`<fruit-game>`, `<game-over-banner>`)
+- **Controller**
+  - Router SPA propio
+  - GameEngine y lógica del juego
 
 ---
 
-##  Programación Funcional
+## 🔄 Programación reactiva
 
-- Uso de funciones **puras** siempre que es posible
-- Funciones impuras solo cuando:
-  - se modifica el DOM
-  - se accede a APIs externas
-- Uso de:
-  - copias inmutables
-  - `map`
-  - separación de responsabilidades
+- Se utiliza **RxJS** para gestionar estado reactivo.
+- El estado del juego notifica automáticamente cambios relevantes (por ejemplo `nextFruits`, `gameOver`).
+- No se utilizan frameworks externos (React, Vue).
 
 ---
 
-##  Tests
+## 🧪 Tests
 
-- Tests unitarios realizados con **Vitest**
-- Se testean todas las funciones puras importantes:
-  - `pureUpdate`
-  - `pureCollisions`
-  - `pureApplyGravity`
-  - `pureApplyAirFriction`
-  - `pureBoundaryFix`
-- Uso de **mocking** para aislar dependencias de estado global
+Se han implementado tests unitarios con **Vitest** para funciones puras:
 
-Ejecutar tests:
+- Físicas
+- Colisiones puras
+- Actualización de estado (`pureUpdate`)
+
 ```bash
 npm run test
