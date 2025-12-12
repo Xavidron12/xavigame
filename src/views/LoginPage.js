@@ -1,4 +1,4 @@
-import { supabase } from "../supabase/supabaseClient.js";
+import { supabaseREST } from "../supabase/supabaseClient.js";
 import { navigate } from "../router/router.js";
 
 export function LoginPage() {
@@ -29,35 +29,20 @@ export function LoginPage() {
   const email = div.querySelector("#email");
   const password = div.querySelector("#password");
   const msg = div.querySelector("#msg");
-  const loginBtn = div.querySelector("#loginBtn");
 
-  loginBtn.onclick = async () => {
+  div.querySelector("#loginBtn").addEventListener("click", async () => {
     msg.textContent = "";
 
-    if (!email.value || !password.value) {
-      msg.textContent = "Rellena todos los campos";
-      return;
+    try {
+      await supabaseREST.signIn(email.value.trim(), password.value);
+      navigate("/");
+    } catch (e) {
+      msg.textContent = e.message;
     }
+  });
 
-    loginBtn.disabled = true;
-    msg.textContent = "Conectando...";
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.value.trim(),
-      password: password.value
-    });
-
-    loginBtn.disabled = false;
-
-    if (error) {
-      msg.textContent = error.message;
-      return;
-    }
-
-    navigate("/");
-  };
-
-  div.querySelector("#goRegister").onclick = () => navigate("/register");
+  div.querySelector("#goRegister")
+    .addEventListener("click", () => navigate("/register"));
 
   return div;
 }

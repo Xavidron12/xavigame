@@ -2,7 +2,7 @@ import { navigate } from "../router/router.js";
 import { importGameState } from "../game/importGameState.js";
 import { resetGame } from "../game/resetGame.js";
 import { GameState } from "../game/state.js";
-import { supabase } from "../supabase/supabaseClient.js";
+import { supabaseREST } from "../supabase/supabaseClient.js";
 
 export function ContinuePage(savedState) {
   const div = document.createElement("div");
@@ -11,7 +11,6 @@ export function ContinuePage(savedState) {
   div.innerHTML = `
     <div class="d-flex gap-4">
 
-      <!-- PARTIDA -->
       <div class="card p-4 rounded-4 shadow" style="width: 320px;">
         <h3 class="text-center mb-3">🎮 Partida</h3>
 
@@ -28,7 +27,6 @@ export function ContinuePage(savedState) {
         </button>
       </div>
 
-      <!-- PERFIL -->
       <div class="card p-4 rounded-4 shadow" style="width: 320px;">
         <h3 class="text-center mb-3">👤 Perfil</h3>
 
@@ -55,79 +53,64 @@ export function ContinuePage(savedState) {
     </div>
   `;
 
-  // ================= BOTONES PARTIDA =================
-  div.querySelector("#continueBtn").onclick = () => {
+  const continueBtn = div.querySelector("#continueBtn");
+  if (!savedState) {
+    continueBtn.disabled = true;
+    continueBtn.textContent = "No hay partida guardada";
+  }
+
+  continueBtn.addEventListener("click", () => {
+    if (!savedState) return;
     importGameState(savedState);
     navigate("/game");
-  };
+  });
 
-  div.querySelector("#oneBtn").onclick = () => {
+  div.querySelector("#oneBtn").addEventListener("click", () => {
     resetGame();
     GameState.playerCount = 1;
     navigate("/game");
-  };
+  });
 
-  div.querySelector("#twoBtn").onclick = () => {
+  div.querySelector("#twoBtn").addEventListener("click", () => {
     resetGame();
     GameState.playerCount = 2;
     navigate("/game");
-  };
+  });
 
-  // ================= PERFIL =================
-  const saveBtn = div.querySelector("#saveProfile");
+  const msg = div.querySelector("#profileMsg");
   const profileName = div.querySelector("#profileName");
   const avatarFile = div.querySelector("#avatarFile");
-  const msg = div.querySelector("#profileMsg");
 
-  saveBtn.onclick = async () => {
+  const session = supabaseREST.getSession();
+  profileName.value = session?.user?.user_metadata?.profile_name || "";
+
+  div.querySelector("#saveProfile").addEventListener("click", async () => {
     msg.textContent = "";
 
-    const {
-      data: { user }
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      msg.textContent = "Usuario no autenticado";
-      return;
-    }
-
-    let avatarUrl = user.user_metadata?.avatar_url || null;
-
-    // ================= SUBIR IMAGEN =================
-    if (avatarFile.files.length > 0) {
-      const file = avatarFile.files[0];
-
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(`${user.id}.png`, file, { upsert: true });
-
-      if (uploadError) {
-        msg.textContent = uploadError.message;
+    try {
+      const user = await supabaseREST.getUser();
+      if (!user) {
+        msg.textContent = "Usuario no autenticado";
         return;
       }
 
-      // 🔑 OBTENER URL PÚBLICA (ESTO ERA LO QUE FALTABA)
-      const { data } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(`${user.id}.png`);
+      let avatarUrl = user.user_metadata?.avatar_url || null;
 
-      avatarUrl = data.publicUrl;
-    }
+      if (avatarFile.files.length > 0) {
+        const file = avatarFile.files[0];
+        avatarUrl = await supabaseREST.uploadAvatar(file, user.id);
+      }
 
-    // ================= GUARDAR PERFIL =================
-    const { error } = await supabase.auth.updateUser({
-      data: {
+      await supabaseREST.updateUser({
         profile_name: profileName.value || "Jugador",
         avatar_url: avatarUrl
-      }
-    });
+      });
 
-    if (error) {
-      msg.textContent = error.message;
-    } else {
       msg.textContent = "Perfil guardado correctamente";
+    } catch (e) {
+      msg.textContent = e.message;
     }
-  };
+  });
 
   return div;
 }

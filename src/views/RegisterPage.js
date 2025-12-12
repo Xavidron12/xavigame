@@ -1,4 +1,4 @@
-import { supabase } from "../supabase/supabaseClient.js";
+import { supabaseREST } from "../supabase/supabaseClient.js";
 import { navigate } from "../router/router.js";
 
 export function RegisterPage() {
@@ -40,44 +40,26 @@ export function RegisterPage() {
   const password = div.querySelector("#password");
   const name = div.querySelector("#name");
   const msg = div.querySelector("#msg");
-  const registerBtn = div.querySelector("#registerBtn");
 
-  registerBtn.onclick = async () => {
+  div.querySelector("#registerBtn").addEventListener("click", async () => {
     msg.textContent = "";
 
-    if (!email.value || !password.value || !name.value) {
-      msg.textContent = "Rellena todos los campos";
-      return;
+    try {
+      await supabaseREST.signUp(
+        email.value.trim(),
+        password.value,
+        name.value.trim()
+      );
+
+      msg.textContent = "Registro correcto. Revisa tu email.";
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (e) {
+      msg.textContent = e.message;
     }
+  });
 
-    registerBtn.disabled = true;
-    msg.textContent = "Creando cuenta...";
-
-    const { data, error } = await supabase.auth.signUp({
-      email: email.value.trim(),
-      password: password.value,
-      options: {
-        data: {
-          profile: {
-            name: name.value.trim(),
-            avatar: "/img/default-avatar.png"
-          }
-        }
-      }
-    });
-
-    registerBtn.disabled = false;
-
-    if (error) {
-      msg.textContent = error.message;
-      return;
-    }
-
-    msg.textContent = "Registro correcto. Revisa tu email.";
-    setTimeout(() => navigate("/login"), 2000);
-  };
-
-  div.querySelector("#backLogin").onclick = () => navigate("/login");
+  div.querySelector("#backLogin")
+    .addEventListener("click", () => navigate("/login"));
 
   return div;
 }
