@@ -7,12 +7,12 @@ export const InputState = {
     left: false,
     right: false,
     drop: false,
-    dropLock: false   // 🔒 evita lanzamientos dobles
+    dropLock: false   //  para que no se produzca un bug de lanzamintos dobles
   },
   p2: {
     left: false,
     right: false,
     drop: false,
-    dropLock: false   // 🔒 evita lanzamientos dobles
+    dropLock: false   
   }
 };

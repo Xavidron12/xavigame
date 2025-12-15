@@ -5,7 +5,7 @@ import { fruitTypes } from "./logic.js";
 const baseState = {
   fruits: [],
 
-  // 🔑 CLAVE DEL SISTEMA
+  // CLAVE DEL SISTEMA
   playerCount: 2, // 1 o 2
 
   players: [

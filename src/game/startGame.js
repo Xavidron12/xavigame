@@ -22,7 +22,7 @@ let keyUpSub = null;
 // Anti doble drop
 const lastDropTime = [0, 0];
 
-// Cooldown de lanzamiento (1 segundo)
+// Cooldown de lanzamiento, esta puesto para 1s
 const MIN_DROP_INTERVAL = 1000;
 
 // ===============================================
@@ -167,7 +167,7 @@ export function startGame() {
     if (c2) c2.getContext("2d").clearRect(0, 0, c2.width, c2.height);
   }
 
-  // Reactividad previews (GameState.nextFruits → notify("nextFruits"))
+  // Reactividad previews (GameState.nextFruits y notify("nextFruits"))
   subscribe("nextFruits", (value) => {
     drawNextFruits("nextCanvas1", value[0]);
     if (GameState.playerCount === 2) drawNextFruits("nextCanvas2", value[1]);

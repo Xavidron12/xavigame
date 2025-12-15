@@ -1,5 +1,5 @@
 // =====================================================
-//    IMPORTAR ESTADO DEL JUEGO → Cargar desde Supabase
+//    IMPORTAR ESTADO DEL JUEGO para cargar desde Supabase
 // =====================================================
 
 import { GameState } from "./state.js";
@@ -9,7 +9,7 @@ import { fruits, players, fruitTypes } from "./logic.js";
 export function importGameState(saved) {
   if (!saved) return;
 
-  // 🔑 RESTAURAR NÚMERO DE JUGADORES
+  // RESTAURAR NuMERO DE JUGADORES
   GameState.playerCount = saved.playerCount ?? 2;
 
   // Limpiar frutas
@@ -42,7 +42,7 @@ export function importGameState(saved) {
     players[1].y = saved.players[1].y;
   }
 
-  // Próximas frutas
+  // Proximas frutas
   GameState.nextFruits = [
     [...saved.nextFruits[0]],
     GameState.playerCount === 2

@@ -3,10 +3,10 @@ export const CONFIG = {
   airFriction: 0.996,
   baseBounce: 0.32,
   lowSpeedRestitution: 0,
-  sleepSpeed: 0.040,      // ligeramente más alto, detecta reposo mejor
-  sleepFrames: 15,        // necesita 15 frames quieta
+  sleepSpeed: 0.040,      
+  sleepFrames: 15,       
   baumgarte: 0.25,
-  subSteps: 3             // más estable
+  subSteps: 3            
 };
 
 export function applyGravity(f, dt, height) {
@@ -88,7 +88,7 @@ function sanitizeVelocity(f) {
 }
 
 // ===========================================
-//  VERSIONES PURAS PARA FUTURO ENGINE FUNCIONAL
+//  VERSIONES PURAS
 // ===========================================
 
 export function pureApplyGravity(vy, dt) {

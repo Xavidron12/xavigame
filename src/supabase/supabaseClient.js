@@ -95,7 +95,7 @@ export const supabaseREST = {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error_description || "Update error");
 
-    // Mantener el session.user actualizado localmente (para HUD, ContinuePage, etc.)
+    // Mantener el session.user actualizado localmente (para HUD, ContinuePage y eso)
     const current = readSession();
     if (current?.user && data?.user_metadata) {
       current.user.user_metadata = data.user_metadata;
@@ -134,7 +134,7 @@ export const supabaseREST = {
       throw new Error(msg);
     }
 
-    // URL pública (bucket avatars debe ser público)
+    // URL publica (bucket avatars debe ser publico)
     return `${SUPABASE_URL}/storage/v1/object/public/avatars/${path}`;
   }
 };

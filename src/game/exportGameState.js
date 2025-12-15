@@ -1,5 +1,5 @@
 // =====================================================
-//   EXPORTAR ESTADO DEL JUEGO → Guardar en Supabase
+//   EXPORTAR ESTADO DEL JUEGO para guardar en Supabase
 // =====================================================
 
 import { GameState } from "./state.js";

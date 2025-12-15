@@ -10,7 +10,7 @@ export function collisionsAndFusion(fruits, fruitTypes) {
     spatial[key].push(index);
   }
 
-  // Construcción hash espacial
+  // El hash
   for (let i = 0; i < fruits.length; i++) {
     const f = fruits[i];
     const a = f.aabb();
@@ -29,7 +29,7 @@ export function collisionsAndFusion(fruits, fruitTypes) {
   const toRemove = new Set();
   const toAdd = [];
 
-  // Comprobación de colisiones
+  // Aqui las colisiones
   for (const key in spatial) {
     const cell = spatial[key];
     const len = cell.length;
@@ -68,7 +68,7 @@ function handleCollision(f1, f2, toAdd, toRemove, fruitTypes) {
 
   if (dist >= minDist) return;
 
-  // 🟡 DEEP SLEEP: ambas dormidas → nada
+  // Si las dos duermen, nada
   if (f1.sleeping && f2.sleeping) return;
 
   // Despertar si estaban dormidas
@@ -76,7 +76,7 @@ function handleCollision(f1, f2, toAdd, toRemove, fruitTypes) {
   if (f2.sleeping) f2.sleeping = false;
 
   // =====================================================
-  //             FUSIÓN ESPECIAL
+  //             FUSIÓN 
   // =====================================================
   if (f1.type === f2.type) {
     const lastType = fruitTypes.length - 1;

@@ -11,7 +11,7 @@ export function resetGame() {
   players[0].x = 150;
   players[1].x = 350;
 
-  // Reiniciar próximas frutas
+  // Reiniciar proximas frutas
   nextFruits[0].length = 0;
   nextFruits[1].length = 0;
 
@@ -26,5 +26,5 @@ export function resetGame() {
   // Reiniciar estado de game over
   GameState.gameOver = false;
 
-  console.log("🔄 Juego reiniciado correctamente");
+  console.log(" Juego reiniciado correctamente");
 }

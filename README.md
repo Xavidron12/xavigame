@@ -1,4 +1,4 @@
-# XaviGame 🎮🍎
+# XaviGame 
 
 Proyecto desarrollado como SPA (Single Page Application) para la asignatura de **Desarrollo Web Cliente**.
 
@@ -6,7 +6,7 @@ El proyecto consiste en un videojuego tipo *Suika Game*, con autenticación, gua
 
 ---
 
-## 🧱 Tecnologías utilizadas
+##  Tecnologías utilizadas
 
 - **JavaScript ES Modules**
 - **Vite** (dev server + build)
@@ -23,7 +23,7 @@ El proyecto consiste en un videojuego tipo *Suika Game*, con autenticación, gua
 
 ---
 
-## 🧠 Arquitectura
+##  Arquitectura
 
 El proyecto sigue una aproximación a **MVC + SPA**:
 
@@ -39,7 +39,7 @@ El proyecto sigue una aproximación a **MVC + SPA**:
 
 ---
 
-## 🔄 Programación reactiva
+##  Programación reactiva
 
 - Se utiliza **RxJS** para gestionar estado reactivo.
 - El estado del juego notifica automáticamente cambios relevantes (por ejemplo `nextFruits`, `gameOver`).
@@ -47,7 +47,7 @@ El proyecto sigue una aproximación a **MVC + SPA**:
 
 ---
 
-## 🧪 Tests
+##  Tests
 
 Se han implementado tests unitarios con **Vitest** para funciones puras:
 

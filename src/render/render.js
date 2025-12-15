@@ -1,7 +1,7 @@
 import { fruitTypes } from "../game/logic.js";
 
 // ================================
-//   CACHE DE IMÁGENES DE JUGADORES
+//   CACHE DE IMAGENES DE JUGADORES
 // ================================
 const playerImages = {};
 

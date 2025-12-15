@@ -19,9 +19,8 @@ export default defineConfig({
     }
   },
 
-  // ==========================
+ 
   //        VITEST
-  // ==========================
   test: {
     environment: "jsdom",
     globals: true

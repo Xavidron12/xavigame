@@ -7,10 +7,10 @@ export function checkGameOver(fruits, height) {
   for (const f of fruits) {
     const t0 = f.spawnTime ?? 0;
 
-    // Ignorar frutas recién creadas
+    // Ignorar frutas recien creadas
     if (now - t0 < GRACE_MS) continue;
 
-    // ✅ GameOver si cualquier fruta toca/pasa el techo (da igual sleeping)
+    // GameOver si cualquier fruta toca/pasa el techo (da igual sleeping)
     if (f.y - f.radius <= CEILING_LIMIT) return true;
   }
 

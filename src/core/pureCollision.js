@@ -1,6 +1,5 @@
 // ====================================================
-// COLISIÓN PURA — Versión MUY SUAVE (solo separación)
-// No fusiona, no rebota fuerte, no afecta al motor real
+// COLISIÓN PURA 
 // ====================================================
 
 export function pureCollisions(fruits) {

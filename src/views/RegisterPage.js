@@ -7,7 +7,7 @@ export function RegisterPage() {
 
   div.innerHTML = `
     <div class="card bg-dark p-4 rounded-4 shadow" style="width: 350px;">
-      <h3 class="text-center mb-3">📝 Crear cuenta</h3>
+      <h3 class="text-center mb-3"> Crear cuenta</h3>
 
       <form id="registerForm">
         <div class="mb-3">
@@ -48,7 +48,7 @@ export function RegisterPage() {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData);
 
-    const { email, password, name } = data; // object destructuring
+    const { email, password, name } = data; 
 
     try {
       await supabaseREST.signUp(

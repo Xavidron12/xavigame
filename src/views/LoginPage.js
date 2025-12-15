@@ -7,7 +7,7 @@ export function LoginPage() {
 
   div.innerHTML = `
     <div class="card bg-secondary p-4 rounded-4 shadow" style="width: 350px;">
-      <h3 class="text-center mb-3">🔐 Iniciar Sesión</h3>
+      <h3 class="text-center mb-3"> Iniciar Sesión</h3>
 
       <form id="loginForm">
         <div class="mb-3">
@@ -43,7 +43,7 @@ export function LoginPage() {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData);
 
-    const { email, password } = data; // object destructuring
+    const { email, password } = data; 
 
     try {
       await supabaseREST.signIn(email.trim(), password);
